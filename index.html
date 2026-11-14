@@ -22,11 +22,14 @@
   input:focus { outline:2px solid #d4af37; border-color:#d4af37; }
   .auto { width:130px; max-width:45%; text-align:right; font-weight:bold; color:#13294b; }
   .tabela-wrap { width:100%; overflow-x:auto; margin-top:16px; -webkit-overflow-scrolling:touch; }
-  table { border-collapse:collapse; font-size:.74rem; min-width:100%; }
-  th, td { padding:7px 4px; border-bottom:1px solid #eef1f5; text-align:left; }
+  table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:.76rem; font-variant-numeric:tabular-nums; }
+  th, td { padding:7px 2px; border-bottom:1px solid #eef1f5; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   th { color:#6b7785; font-size:.72rem; }
-  td.v, th.v { text-align:right; white-space:nowrap; }
-  td:first-child, th:first-child { min-width:90px; }
+  th.v, td.v { text-align:right; }
+  th:nth-child(1), td:nth-child(1) { width:30%; }
+  th:nth-child(2), td:nth-child(2) { width:23%; }
+  th:nth-child(3), td:nth-child(3) { width:25%; }
+  th:nth-child(4), td:nth-child(4) { width:22%; }
   tr.total td { font-weight:bold; border-top:2px solid #13294b; color:#13294b; }
   .destaque { margin-top:20px; background:#13294b; color:#f5d77a; padding:16px; border-radius:10px;
               font-size:1.05rem; text-align:center; font-weight:bold; }
@@ -70,6 +73,7 @@
 
 <script>
   const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const num = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const get = id => parseFloat(document.getElementById(id).value) || 0;
 
   function calcular() {
@@ -93,9 +97,9 @@
 
     let html = '<tr><th>Item</th><th class="v">Mensal</th><th class="v">Anual</th><th class="v">Diário</th></tr>';
     itens.forEach(([nome, anual]) => {
-      html += `<tr><td>${nome}</td><td class="v">${fmt(anual / 12)}</td><td class="v">${fmt(anual)}</td><td class="v">${fmt(anual / divisor)}</td></tr>`;
+      html += `<tr><td>${nome}</td><td class="v">${num(anual / 12)}</td><td class="v">${num(anual)}</td><td class="v">${num(anual / divisor)}</td></tr>`;
     });
-    html += `<tr class="total"><td>Total</td><td class="v">${fmt(total / 12)}</td><td class="v">${fmt(total)}</td><td class="v">${fmt(total / divisor)}</td></tr>`;
+    html += `<tr class="total"><td>Total</td><td class="v">${num(total / 12)}</td><td class="v">${num(total)}</td><td class="v">${num(total / divisor)}</td></tr>`;
 
     document.getElementById('tabela').innerHTML = html;
     document.getElementById('resumo').textContent = `Custo fixo diário: ${fmt(total / divisor)}`;
