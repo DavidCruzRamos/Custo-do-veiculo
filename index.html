@@ -13,15 +13,18 @@
                border:3px solid #d4af37; box-shadow:0 4px 16px rgba(0,0,0,.4); }
   header h1 { font-size:1.5rem; margin:12px 0 4px; color:#f5d77a; letter-spacing:1px; }
   header p { margin:0; font-size:.9rem; color:#9fb8d9; }
-  .card { background:#fff; max-width:560px; margin:0 auto; padding:24px; border-radius:14px;
+  .card { background:#fff; max-width:560px; margin:0 auto 16px; padding:24px; border-radius:14px;
           box-shadow:0 6px 20px rgba(0,0,0,.3); border-top:4px solid #d4af37; }
   h2 { font-size:1.1rem; margin:0 0 8px; color:#13294b; }
+  .aviso { font-size:.8rem; color:#6b7785; margin:0 0 6px; }
   label { display:flex; justify-content:space-between; align-items:center; margin:10px 0; gap:12px; font-size:.95rem; }
   input { width:150px; padding:7px 9px; border:1px solid #c5ced9; border-radius:8px; text-align:right; font-size:.95rem; }
   input:focus { outline:2px solid #d4af37; border-color:#d4af37; }
-  table { width:100%; border-collapse:collapse; margin-top:16px; font-size:.95rem; }
-  td { padding:9px 4px; border-bottom:1px solid #eef1f5; }
-  td.v { text-align:right; }
+  .auto { width:150px; text-align:right; font-weight:bold; color:#13294b; }
+  table { width:100%; border-collapse:collapse; margin-top:16px; font-size:.92rem; }
+  th, td { padding:8px 4px; border-bottom:1px solid #eef1f5; }
+  th { text-align:left; color:#6b7785; font-size:.82rem; }
+  td.v, th.v { text-align:right; }
   tr.total td { font-weight:bold; border-top:2px solid #13294b; color:#13294b; }
   .destaque { margin-top:20px; background:#13294b; color:#f5d77a; padding:16px; border-radius:10px;
               font-size:1.1rem; text-align:center; font-weight:bold; }
@@ -34,20 +37,28 @@
   <h1>OS VISIONÁRIOS</h1>
   <p>Controle de custo do veículo</p>
 </header>
+
 <div class="card">
   <h2>Dados do veículo</h2>
   <label>Valor do veículo (R$) <input type="number" id="valor" value="40500"></label>
-  <label>IPVA anual (R$) <input type="number" id="ipva" value="968"></label>
-  <label>Seguro anual (R$) <input type="number" id="seguro" value="2160"></label>
-  <label>Prestação anual (R$) <input type="number" id="prestacao" value="6244.08"></label>
-  <label>Licenciamento anual (R$) <input type="number" id="licenciamento" value="135.95"></label>
-  <label>Reserva para manutenção anual (R$) <input type="number" id="manutencao" value="7440"></label>
+  <label>IPVA anual, 4% automático (R$) <span class="auto" id="ipvaAuto"></span></label>
   <label>Depreciação anual (%) <input type="number" id="depTaxa" value="10"></label>
   <label>Dias por mês considerados <input type="number" id="dias" value="31"></label>
+</div>
+
+<div class="card">
+  <h2>Despesas mensais</h2>
+  <p class="aviso">Digite os valores de cada mês. O app calcula o anual automaticamente.</p>
+  <label>Prestação mensal (R$) <input type="number" id="prestacao" value="520.34"></label>
+  <label>Seguro mensal (R$) <input type="number" id="seguro" value="180"></label>
+  <label>Licenciamento mensal (R$) <input type="number" id="licenciamento" value="11.33"></label>
+  <label>Reserva para manutenção mensal (R$) <input type="number" id="manutencao" value="620"></label>
   <table id="tabela"></table>
   <div class="destaque" id="resumo"></div>
 </div>
+
 <footer>Os Visionários · Foco, força e fé</footer>
+
 <script>
   const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const get = id => parseFloat(document.getElementById(id).value) || 0;
@@ -57,22 +68,25 @@
     const dias = get('dias') || 31;
     const divisor = dias * 12;
 
+    const ipvaAnual = valor * 0.04;
+    document.getElementById('ipvaAuto').textContent = fmt(ipvaAnual);
+
     const itens = [
-      ['IPVA', get('ipva')],
-      ['Seguro', get('seguro')],
-      ['Prestação', get('prestacao')],
-      ['Licenciamento', get('licenciamento')],
-      ['Reserva para manutenção', get('manutencao')],
+      ['IPVA (4%)', ipvaAnual],
+      ['Seguro', get('seguro') * 12],
+      ['Prestação', get('prestacao') * 12],
+      ['Licenciamento', get('licenciamento') * 12],
+      ['Reserva para manutenção', get('manutencao') * 12],
       ['Depreciação', valor * get('depTaxa') / 100]
     ];
 
     const total = itens.reduce((soma, item) => soma + item[1], 0);
 
-    let html = '<tr><td><b>Item</b></td><td class="v"><b>Anual</b></td><td class="v"><b>Diário</b></td></tr>';
+    let html = '<tr><th>Item</th><th class="v">Mensal</th><th class="v">Anual</th><th class="v">Diário</th></tr>';
     itens.forEach(([nome, anual]) => {
-      html += `<tr><td>${nome}</td><td class="v">${fmt(anual)}</td><td class="v">${fmt(anual / divisor)}</td></tr>`;
+      html += `<tr><td>${nome}</td><td class="v">${fmt(anual / 12)}</td><td class="v">${fmt(anual)}</td><td class="v">${fmt(anual / divisor)}</td></tr>`;
     });
-    html += `<tr class="total"><td>Total</td><td class="v">${fmt(total)}</td><td class="v">${fmt(total / divisor)}</td></tr>`;
+    html += `<tr class="total"><td>Total</td><td class="v">${fmt(total / 12)}</td><td class="v">${fmt(total)}</td><td class="v">${fmt(total / divisor)}</td></tr>`;
 
     document.getElementById('tabela').innerHTML = html;
     document.getElementById('resumo').textContent = `Custo fixo diário: ${fmt(total / divisor)}`;
