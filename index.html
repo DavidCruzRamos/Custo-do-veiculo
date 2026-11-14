@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visionários - Custo do Veículo</title>
+<style>
+  :root {
+    --azul: #0b1f3a;
+    --azul-claro: #4fb3e8;
+    --dourado: #c9a64b;
+    --fundo: #eef2f7;
+    --texto: #1d2733;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--fundo);
+    margin: 0;
+    color: var(--texto);
+  }
+  header {
+    background: linear-gradient(135deg, var(--azul), #13335e);
+    color: #fff;
+    text-align: center;
+    padding: 28px 16px 22px;
+    border-bottom: 4px solid var(--dourado);
+  }
+  header img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--dourado);
+    box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  }
+  header h1 {
+    margin: 12px 0 4px;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+  header p {
+    margin: 0;
+    color: var(--dourado);
+    font-size: .9rem;
+    letter-spacing: 1px;
+  }
+  main {
+    max-width: 620px;
+    margin: -20px auto 40px;
+    padding: 0 16px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(11,31,58,.10);
+    margin-bottom: 18px;
+  }
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    color: var(--azul);
+    border-left: 4px solid var(--azul-claro);
+    padding-left: 10px;
+  }
+  label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+    font-size: .93rem;
+  }
+  input {
+    width: 150px;
+    padding: 8px 10px;
+    border: 1px solid #c8d1dc;
+    border-radius: 8px;
+    text-align: right;
+    font-size: .95rem;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--azul-claro);
+    box-shadow: 0 0 0 3px rgba(79,179,232,.25);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .93rem;
+  }
+  th, td { padding: 9px 6px; border-bottom: 1px solid #edf1f5; }
+  th { text-align: left; color: #6b7785; font-weight: 600; font-size: .85rem; }
+  td.v, th.v { text-align: right; }
+  tr.total td {
+    font-weight: bold;
+    color: var(--azul);
+    border-top: 2px solid var(--azul);
+    border-bottom: none;
+  }
+  .destaque {
+    background: linear-gradient(135deg, var(--azul), #13335e);
+    color: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(11,31,58,.25);
+  }
+  .destaque small {
+    display: block;
+    color: var(--dourado);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .destaque strong { font-size: 1.6rem; }
+  footer {
+    text-align: center;
+    color: #6b7785;
+    font-size: .85rem;
+    padding: 10px 0 30px;
+  }
+  @media (max-width: 480px) {
+    input { width: 120px; }
+    header img { width: 120px; height: 120px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo.jpeg" alt="Logo Visionários">
+  <h1>VISIONÁRIOS</h1>
+  <p>FOCO, FORÇA E FÉ</p>
+</header>
+
+<main>
+  <div class="card">
+    <h2>Dados do veículo</h2>
+    <label>Valor do veículo (R$) <input type="number" id="valor" value="40500"></label>
+    <label>IPVA anual (R$) <input type="number" id="ipva" value="968"></label>
+    <label>Seguro anual (R$) <input type="number" id="seguro" value="2160"></label>
+    <label>Prestação anual (R$) <input type="number" id="prestacao" value="6244.08"></label>
+    <label>Licenciamento anual (R$) <input type="number" id="licenciamento" value="135.95"></label>
+    <label>Reserva para manutenção anual (R$) <input type="number" id="manutencao" value="7440"></label>
+    <label>Depreciação anual (%) <input type="number" id="depTaxa" value="10"></label>
+    <label>Dias por mês considerados <input type="number" id="dias" value="31"></label>
+  </div>
+
+  <div class="card">
+    <h2>Custo fixo</h2>
+    <table id="tabela"></table>
+  </div>
+
+  <div class="destaque">
+    <small>CUSTO FIXO DIÁRIO</small>
+    <strong id="resumo"></strong>
+  </div>
+</main>
+
+<footer>Visionários • Transporte executivo</footer>
+
+<script>
+  const fmt = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const get = id => parseFloat(document.getElementById(id).value) || 0;
+
+  function calcular() {
+    const valor = get('valor');
+    const dias = get('dias') || 31;
+    const divisor = dias * 12;
+
+    const itens = [
+      ['IPVA', get('ipva')],
+      ['Seguro', get('seguro')],
+      ['Prestação', get('prestacao')],
+      ['Licenciamento', get('licenciamento')],
+      ['Reserva para manutenção', get('manutencao')],
+      ['Depreciação', valor * get('depTaxa') / 100]
+    ];
+
+    const total = itens.reduce((soma, item) => soma + item[1], 0);
+
+    let html = '<tr><th>Item</th><th class="v">Anual</th><th class="v">Diário</th></tr>';
+    itens.forEach(([nome, anual]) => {
+      html += `<tr><td>${nome}</td><td class="v">${fmt(anual)}</td><td class="v">${fmt(anual / divisor)}</td></tr>`;
+    });
+    html += `<tr class="total"><td>Total</td><td class="v">${fmt(total)}</td><td class="v">${fmt(total / divisor)}</td></tr>`;
+
+    document.getElementById('tabela').innerHTML = html;
+    document.getElementById('resumo').textContent = fmt(total / divisor);
+  }
+
+  document.querySelectorAll('input').forEach(i => i.addEventListener('input', calcular));
+  calcular();
+</script>
+</body>
+</html>
