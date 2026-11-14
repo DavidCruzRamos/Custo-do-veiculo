@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Os Visionários - Custo do Veículo</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#13294b">
+<link rel="apple-touch-icon" href="IMG_20261113_215816.jpg">
 <style>
   * { box-sizing: border-box; }
   body { font-family: system-ui, sans-serif; margin:0; padding:20px 8px; min-height:100vh; color:#1d2633;
@@ -107,6 +110,10 @@
 
   document.querySelectorAll('input').forEach(i => i.addEventListener('input', calcular));
   calcular();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
 </script>
 </body>
 </html>
