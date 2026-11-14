@@ -1,0 +1,17 @@
+{
+  "name": "Os Visionários - Custo do Veículo",
+  "short_name": "Visionários",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1a2e",
+  "theme_color": "#13294b",
+  "icons": [
+    {
+      "src": "IMG_20261113_215816.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
